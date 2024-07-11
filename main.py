@@ -32,6 +32,10 @@ class DeadlineCalendar:
         self.time_format = time_format
         self.deadline_info = ['Month', 'Day', 'Year', 'Hours', 'Minutes']
         self.deadlines_list = []
+        self.menu_choices = {('A', 'ADD', '[A]dd deadline'): self.add,
+                ('R', 'REMOVE', '[R]emove deadline'): self.remove,
+                ('S', 'SEE', '[S]ee deadlines'): self.see,
+                ('C', 'CLOSE', '[C]lose the calendar'): close}
 
         # Will convert the deadlines strings into datetime
         for deadline in deadlines['deadlines']:
@@ -123,6 +127,21 @@ class DeadlineCalendar:
         print()
         pause()
         clear()
+    
+    # Brings up a menu to use the calendar
+    def menu(self):
+        clear()
+        while True:
+            choices_str = ''
+            for choice in self.menu_choices.keys():
+                choices_str += f'{choice[-1]} | '
+            choices_str = choices_str[:-3]
+            print(f'What would you like to do with your calendar?\n\n{choices_str}\n')
+            choice_selected = input().upper()
+
+            for choice in self.menu_choices.keys():
+                if choice_selected in choice:
+                    self.menu_choices[choice]()
 
 if __name__ == '__main__':
     FILE_PATH = Path(__file__).absolute().parent
@@ -146,7 +165,4 @@ if __name__ == '__main__':
             data = json.load(f)
 
 test = DeadlineCalendar(data, DEADLINES_PATH)
-test.add()
-test.see()
-test.remove()
-test.see()
+test.menu()
