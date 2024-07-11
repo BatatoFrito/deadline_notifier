@@ -72,6 +72,47 @@ class DeadlineCalendar:
                 f.seek(0)
         clear()
 
+    # Removes a deadline
+    def remove(self):
+        # Checks if there are deadlines
+        clear()
+        if not self.deadlines['deadlines']:
+            print('There are no deadlines to delete...\n')
+            pause()
+            clear()
+            return
+
+        # Indexes the deadlines and then asks the user which one it wants to select
+        index = 1
+        for deadline in self.deadlines['deadlines']:
+            print(f"{index} - {deadline['Date_Time']}")
+            index += 1
+        to_delete = input('\nWhich deadline would you like to delete? (ID Number): ')
+        clear()
+
+        # Deletes the contact
+        confirmation = input('Are you sure you want to delete this deadline? (Y/N): ').upper()
+        if confirmation.startswith('Y'):
+            try:
+                # Validates selected deadline
+                to_delete = int(to_delete)
+                if to_delete <= 0:
+                    raise ValueError('Index has to be bigger than 0')
+                to_delete -= 1
+                self.deadlines_list.pop(to_delete)
+                self.deadlines['deadlines'].pop(to_delete)
+                json_deadlines = json.dumps(self.deadlines)
+                with open(self.json_file, 'w+') as f:
+                    f.truncate(0)
+                    f.seek(0)
+                    f.write(json_deadlines)
+                    f.seek(0)
+            except(ValueError, IndexError):
+                clear()
+                print('Invalid deadline ID...\n')
+                pause()
+        clear()
+
 if __name__ == '__main__':
     FILE_PATH = Path(__file__).absolute().parent
     DEADLINES_PATH = FILE_PATH / 'deadlines.json'
@@ -94,4 +135,4 @@ if __name__ == '__main__':
             data = json.load(f)
 
 test = DeadlineCalendar(data, DEADLINES_PATH)
-test.add()
+test.remove()
