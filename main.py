@@ -6,7 +6,7 @@ This program is a desktop deadline notifier
 
 from pynotifier import Notification, NotificationClient
 from pynotifier.backends import platform
-from tzlocal import get_localzone, get_localzone_name
+from tzlocal import get_localzone_name
 from pytz import timezone
 from pathlib import Path
 import datetime
