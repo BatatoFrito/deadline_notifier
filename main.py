@@ -113,6 +113,17 @@ class DeadlineCalendar:
                 pause()
         clear()
 
+    # See deadlines
+    def see(self):
+        clear()
+        index = 1
+        for deadline in self.deadlines['deadlines']:
+            print(f'{index} - {deadline["Date_Time"]}')
+            index += 1
+        print()
+        pause()
+        clear()
+
 if __name__ == '__main__':
     FILE_PATH = Path(__file__).absolute().parent
     DEADLINES_PATH = FILE_PATH / 'deadlines.json'
@@ -135,4 +146,7 @@ if __name__ == '__main__':
             data = json.load(f)
 
 test = DeadlineCalendar(data, DEADLINES_PATH)
+test.add()
+test.see()
 test.remove()
+test.see()
