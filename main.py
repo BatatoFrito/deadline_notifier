@@ -39,7 +39,8 @@ class DeadlineCalendar:
         self.menu_choices = {('A', 'ADD', '[A]dd deadline'): self.add,
                 ('R', 'REMOVE', '[R]emove deadline'): self.remove,
                 ('S', 'SEE', '[S]ee deadlines'): self.see,
-                ('C', 'CLOSE', '[C]lose the calendar'): close}
+                ('C', 'CLOSE', '[C]lose the calendar'): close,
+                ('T', 'TURN ON', '[T]urn on the notifier'): self.on}
 
         # Will convert the deadlines strings into datetime
         for deadline in deadlines['deadlines']:
