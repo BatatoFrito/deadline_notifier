@@ -24,10 +24,14 @@ def close():
     clear()
     return sys.exit()
 
+def modified_time(file: Path):
+    return os.path.getmtime(file)
+
 class DeadlineCalendar:
     def __init__(self, deadlines: dict, json_file: Path, tz_local=get_localzone_name(), time_format='%m/%d/%Y - %H:%M'):
         self.deadlines = deadlines
         self.json_file = json_file
+        self.json_file_mtime = modified_time(json_file)
         self.tz_local = tz_local
         self.time_format = time_format
         self.deadline_info = ['Month', 'Day', 'Year', 'Hours', 'Minutes']
@@ -127,7 +131,34 @@ class DeadlineCalendar:
         print()
         pause()
         clear()
-    
+
+    # Turn ON deadline alarm
+    def on(self):
+        while True:
+            # Gets time now and checks if json file has been modified
+            datetime_now_converted = datetime.datetime.now(timezone(self.tz_local)).strftime(self.time_format)
+            recent_json_mtime = modified_time(self.json_file)
+            if recent_json_mtime != self.json_file_mtime:
+                clear()
+                try:
+                    with open(self.json_file, 'r') as f:
+                        self.deadlines = json.load(f)
+                except(FileNotFoundError):
+                    print('deadlines.json file not found...\n')
+                    pause()
+                    continue
+            # Checks if time now matches a deadline, notifies the user if it does and then deletes the deadline
+            for index, deadline in enumerate(self.deadlines['deadlines']):
+                if deadline['Date_Time'] == datetime_now_converted:
+                    print('BEEEEEEP')
+                    self.deadlines['deadlines'].pop(index)
+                    json_deadlines = json.dumps(self.deadlines)
+                    with open(self.json_file, 'w+') as f:
+                        f.truncate(0)
+                        f.seek(0)
+                        f.write(json_deadlines)
+                        f.seek(0)
+
     # Brings up a menu to use the calendar
     def menu(self):
         clear()
@@ -164,5 +195,6 @@ if __name__ == '__main__':
             f.seek(0)
             data = json.load(f)
 
-test = DeadlineCalendar(data, DEADLINES_PATH)
-test.menu()
+calendar = DeadlineCalendar(data, DEADLINES_PATH)
+calendar.add()
+calendar.on()
