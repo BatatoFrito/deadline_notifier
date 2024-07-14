@@ -92,10 +92,8 @@ class DeadlineCalendar:
             return
 
         # Indexes the deadlines and then asks the user which one it wants to select
-        index = 1
-        for deadline in self.deadlines['deadlines']:
+        for index, deadline in enumerate(self.deadlines['deadlines'], 1):
             print(f"{index} - {deadline['Date_Time']}")
-            index += 1
         to_delete = input('\nWhich deadline would you like to delete? (ID Number): ')
         clear()
 
@@ -125,10 +123,8 @@ class DeadlineCalendar:
     # See deadlines
     def see(self):
         clear()
-        index = 1
-        for deadline in self.deadlines['deadlines']:
+        for index, deadline in enumerate(self.deadlines['deadlines'], 1):
             print(f'{index} - {deadline["Date_Time"]}')
-            index += 1
         print()
         pause()
         clear()
