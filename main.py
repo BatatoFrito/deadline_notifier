@@ -35,12 +35,15 @@ class DeadlineCalendar:
         self.tz_local = tz_local
         self.time_format = time_format
         self.deadline_info = ['Month', 'Day', 'Year', 'Hours', 'Minutes']
+        self.notification_info = ['Deadline Title', 'Deadline Message']
         self.deadlines_list = []
+        self.client = NotificationClient()
+        self.client.register_backend(platform.Backend())
         self.menu_choices = {('A', 'ADD', '[A]dd deadline'): self.add,
                 ('R', 'REMOVE', '[R]emove deadline'): self.remove,
                 ('S', 'SEE', '[S]ee deadlines'): self.see,
-                ('C', 'CLOSE', '[C]lose the calendar'): close,
-                ('T', 'TURN ON', '[T]urn on the notifier'): self.on}
+                ('T', 'TURN ON', '[T]urn on the notifier'): self.on,
+                ('C', 'CLOSE', '[C]lose the calendar'): close}
 
         # Will convert the deadlines strings into datetime
         for deadline in deadlines['deadlines']:
@@ -60,13 +63,20 @@ class DeadlineCalendar:
             clear()
             temp_info = input(f'{info}: ')
             temp_deadline[info] = int(temp_info)
+
+        for info in self.notification_info:
+            clear()
+            temp_info = input(f'{info}: ')
+            temp_deadline[info] = temp_info
         clear()
 
         # Converts temporary deadline info into datetime, string and a dictionary
+        temp_title = temp_deadline['Deadline Title']
+        temp_message = temp_deadline['Deadline Message']
         temp_deadline_datetime = datetime.datetime(temp_deadline['Year'], temp_deadline['Month'], temp_deadline['Day'],
                                                    temp_deadline['Hours'], temp_deadline['Minutes'], tzinfo=timezone(self.tz_local))
         temp_deadline_str = temp_deadline_datetime.strftime(self.time_format)
-        temp_deadline_dict = {'Date_Time': temp_deadline_str, 'TZ': self.tz_local}
+        temp_deadline_dict = {'Date_Time': temp_deadline_str, 'TZ': self.tz_local, 'Title': temp_title, 'Message': temp_message}
 
         # Saves the new deadline
         confirmation = input('Are you sure you want to create this deadline? (Y/N): ').upper()
@@ -147,7 +157,9 @@ class DeadlineCalendar:
             # Checks if time now matches a deadline, notifies the user if it does, and then deletes the deadline
             for index, deadline in enumerate(self.deadlines['deadlines']):
                 if deadline['Date_Time'] == datetime_now_converted:
-                    print('BEEEEEEP')
+                    notification = Notification(title=f'{deadline["Title"]}', message=f'{deadline["Message"]}\n\n{deadline["Date_Time"]}', \
+                                                duration=5)
+                    self.client.notify_all(notification)
                     self.deadlines['deadlines'].pop(index)
                     json_deadlines = json.dumps(self.deadlines)
                     with open(self.json_file, 'w+') as f:
@@ -185,13 +197,14 @@ if __name__ == '__main__':
                     '"deadlines": ['
                         '{'
                             '"Date_Time": "01/01/2024 - 00:00",'
-                            '"TZ": "UTC"'
+                            '"TZ": "UTC",'
+                            '"Title": "End of Deadline",'
+                            '"Message": "Deadline has reached its end..."'
                         '}'
                                 ']'
                     '}')
             f.seek(0)
             data = json.load(f)
 
-calendar = DeadlineCalendar(data, DEADLINES_PATH)
-calendar.add()
-calendar.on()
+    calendar = DeadlineCalendar(data, DEADLINES_PATH)
+    calendar.menu()
