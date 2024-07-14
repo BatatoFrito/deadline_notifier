@@ -147,7 +147,7 @@ class DeadlineCalendar:
                     print('deadlines.json file not found...\n')
                     pause()
                     continue
-            # Checks if time now matches a deadline, notifies the user if it does and then deletes the deadline
+            # Checks if time now matches a deadline, notifies the user if it does, and then deletes the deadline
             for index, deadline in enumerate(self.deadlines['deadlines']):
                 if deadline['Date_Time'] == datetime_now_converted:
                     print('BEEEEEEP')
